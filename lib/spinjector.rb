@@ -3,6 +3,7 @@
 # @author Guillaume Berthier
 #
 
+require 'optparse'
 require 'xcodeproj'
 require 'yaml'
 
@@ -12,6 +13,16 @@ require 'yaml'
 BUILD_PHASE_PREFIX = '[SPI] '.freeze
 
 CONFIGURATION_FILE_PATH = 'Configuration/spinjector_configuration.yaml'.freeze
+
+options = {}
+OptionParser.new do |opts|
+  opts.banner = "Usage: spinjector [options]"
+
+
+  opts.on("-cName", "--configuration-path=Name", "Inject scripts using configuration file at Name location. Default is ./#{CONFIGURATION_FILE_PATH}") do |config_path|
+    options[:configuration_path] = config_path
+  end
+end.parse!
 
 # @param [Xcodeproj::Project] project
 #
@@ -29,10 +40,10 @@ end
 
 # @param [Xcodeproj::Project] project
 # 
-def inject_script_phases(project)
-  configuration_file = load_yml_content(CONFIGURATION_FILE_PATH)
+def inject_script_phases(project, configuration_file_path)
+  configuration_file = load_yml_content(configuration_file_path)
   configuration_file.each do |target_name, script_paths|
-    return unless !target_name.nil?
+    warn "[Warning] No script phases found for #{target_name} target. You can add them in your configuration file at #{configuration_file_path}"
     script_phases = (script_paths || []).flat_map do |script_path|
       load_yml_content(script_path)
     end
@@ -45,10 +56,7 @@ end
 # @return [Hash] the hash in the configuration file
 #
 def load_yml_content(configuration_path)
-  if !File.exist?(configuration_path)
-    puts "Script phase #{configuration_path} unknown"
-    return {}
-  end
+  raise "[Error] YAML file #{configuration_path} not found." unless File.exist?(configuration_path)
   YAML.load(File.read(configuration_path)) || {}
 end
 
@@ -58,7 +66,7 @@ end
 #
 def app_target(project, target_name)
   target = project.targets.find { |t| t.name == target_name }
-  puts "Invalid #{target_name} target." unless !target.nil?
+  raise "[Error] Invalid #{target_name} target." unless !target.nil?
   return target
 end
 
@@ -135,7 +143,9 @@ end
 
 project_path = Dir.glob("*.xcodeproj").first
 project = Xcodeproj::Project.open(project_path)
+raise "[Error] No xcodeproj found" unless !project.nil?
 remove_all_spi_script_phases(project)
-inject_script_phases(project)
+configuration_file_path = options[:configuration_path] || CONFIGURATION_FILE_PATH
+inject_script_phases(project, configuration_file_path)
 project.save()
-puts "Success"
+puts "Success."
