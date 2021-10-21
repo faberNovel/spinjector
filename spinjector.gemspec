@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name        = 'spinjector'
-  s.version     = '0.0.4'
+  s.version     = '0.0.5'
   s.executables << 'spinjector'
   s.summary     = "Inject script phases into your Xcode project"
   s.description = ""
