@@ -25,16 +25,28 @@ Then, for each script you want to inject in your Xcode project, create:
 - A configuration file for this script
 ```
 name: "Hello World"                  # required. Script phase name.
+
+# One and only one :script_path or :script may appear.
+# For now, it makes no sense to have 2 differents script sources.
 script_path: "Script/helloworld.sh"  # required. Script file path.
+script: |                            # required. Script.
+  <some code lines>
+  <other code lines>
+
 input_paths:                         # optional.
   - ""
+
 output_paths: # optional.
   - ""
+
 input_file_list_paths:               # optional.
   - ""
+
 output_file_list_paths:              # optional.
   - ""
+
 dependency_file:                     # optional.
+
 execution_position:                  # optional. [:before-compile | :after-compile | :before-headers | :after-headers].
 ```
 

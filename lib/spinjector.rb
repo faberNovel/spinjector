@@ -77,8 +77,8 @@ def create_script_phases(script_phases, target)
   script_phases.each do |script_phase|
     name_with_prefix = BUILD_PHASE_PREFIX + script_phase["name"]
     phase = target.new_shell_script_build_phase(name_with_prefix)
-    script = File.read(script_phase["script_path"])
-    phase.shell_script = script
+    shell_script = get_script(script_phase)
+    phase.shell_script = shell_script
     phase.shell_path = script_phase["shell_path"] || '/bin/sh'
     phase.input_paths = script_phase["input_paths"]
     phase.output_paths = script_phase["output_paths"]
@@ -93,6 +93,27 @@ def create_script_phases(script_phases, target)
 
     execution_position = script_phase["execution_position"] || :before_compile
     reorder_script_phase(target, phase, execution_position)
+  end
+end
+
+# @param [Hash] script_phase the script phase defined in configuration files
+# @return [String] script to add in script phase
+#
+# If script is in a dedicated file, find the URL under <script_path>.
+# Otherwise, it may be written directly in the configuration file, find it under <script>.
+#
+def get_script(script_phase)
+  if !script_phase["script"].nil? and !script_phase["script_path"].nil?
+    raise "[Error] Script phase #{script_phase["name"]} contains 2 script sources. Please use one of :script_path or :script option"
+  end
+  if !script_phase["script_path"].nil?
+    raise "[Error] File #{script_phase["script_path"]} does not exist" unless File.exist?(script_phase["script_path"])
+    File.read(script_phase["script_path"])
+  elsif !script_phase["script"].nil?
+    script_phase["script"]
+  else
+    warn "[Warning] Script phase #{script_phase["name"]} contains no script"
+    return ""
   end
 end
 
