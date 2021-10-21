@@ -1,11 +1,5 @@
 name: "HelloWorld"
-
 script_path: "Scripts/helloworld.sh"
-#or
-script: |
-  echo Hello
-  echo World
-
 input_paths:
 output_paths:
 input_file_list_paths:

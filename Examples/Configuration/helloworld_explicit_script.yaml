@@ -1,0 +1,9 @@
+name: "HelloWorldExplicit"
+script: |
+  echo Hello
+  echo World
+input_paths:
+  - "Configuration/hello_world_input"
+output_paths:
+  - "Configuration/hello_world_output"
+execution_position: :before_compile

@@ -7,5 +7,6 @@
 
 TargetNameA:
   - "helloworld.yaml"
+  - "helloworld_explicit_script.yaml"
 TargetNameB:
   - "helloworld_short.yaml"

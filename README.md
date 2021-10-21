@@ -59,5 +59,8 @@ echo Hello World
 Finally, inject script phases
 ```
 spinjector [-c] <path-to-your-global-configuration-file>
-
 ```
+
+Enjoy your build phases
+![Image of your build phases](/Examples/Images/build_phases.png)
+![Image of hello world 2 build phase](/Examples/Images/hello_world_explicit.png)

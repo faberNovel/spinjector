@@ -1,2 +1,3 @@
 name: "HelloWorldShort"
 script_path: "Scripts/helloworld.sh"
+execution_position: :after_compile
