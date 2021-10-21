@@ -1,0 +1,11 @@
+# TargetNameFoo:
+#     - <script path A> to inject
+#     - <script path B> to inject
+# TargetNameBar:
+#     - <script path A> to inject
+#     - <script path C> to inject
+
+TargetNameA:
+  - "helloworld.yaml"
+TargetNameB:
+  - "helloworld_short.yaml"

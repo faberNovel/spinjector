@@ -1,0 +1,8 @@
+name: "HelloWorld"
+script_path: "Scripts/helloworld.sh"
+input_paths:
+output_paths:
+input_file_list_paths:
+output_file_list_paths:
+dependency_file:
+execution_position: :before_compile
