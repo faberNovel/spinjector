@@ -43,10 +43,10 @@ end
 def inject_script_phases(project, configuration_file_path)
   configuration_file = load_yml_content(configuration_file_path)
   configuration_file.each do |target_name, script_paths|
-    warn "[Warning] No script phases found for #{target_name} target. You can add them in your configuration file at #{configuration_file_path}"
     script_phases = (script_paths || []).flat_map do |script_path|
       load_yml_content(script_path)
     end
+    warn "[Warning] No script phases found for #{target_name} target. You can add them in your configuration file at #{configuration_file_path}" unless !script_phases.empty?
     target = app_target(project, target_name)
     create_script_phases(script_phases, target)
   end
