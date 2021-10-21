@@ -1,12 +1,18 @@
-# TargetNameFoo:
-#     - <script path A> to inject
-#     - <script path B> to inject
-# TargetNameBar:
-#     - <script path A> to inject
-#     - <script path C> to inject
+scripts:
+  foo:
+    name: "Foo"
+    script_path: "Scripts/helloworld.sh"
+  bar:
+    name: "Bar"
+    script: |
+      echo Bar
+    execution_position: :after_compile
 
-TargetNameA:
-  - "helloworld.yaml"
-  - "helloworld_explicit_script.yaml"
-TargetNameB:
-  - "helloworld_short.yaml"
+targets:
+  TargetNameA:
+    - foo
+    - "helloworld.yaml"
+    - bar
+    - "helloworld_explicit_script.yaml"
+  TargetNameB:
+    - "helloworld_short.yaml"

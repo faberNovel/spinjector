@@ -42,9 +42,19 @@ end
 # 
 def inject_script_phases(project, configuration_file_path)
   configuration_file = load_yml_content(configuration_file_path)
-  configuration_file.each do |target_name, script_paths|
+  # Check if there are scripts in the global configuration file
+  implicit_scripts = configuration_file["scripts"] || []
+  configuration_file["targets"].each do |target_name, script_paths|
     script_phases = (script_paths || []).flat_map do |script_path|
-      load_yml_content(script_path)
+      if !implicit_scripts.empty? and !implicit_scripts[script_path].nil?
+        # Target uses script from the global configuration file
+        script = implicit_scripts[script_path]
+      else
+        # Target uses script from a dedicated configuration file
+        script = load_yml_content(script_path)
+      end
+      raise "[Error] Could not find script #{script_path}" unless !script.nil?
+      script
     end
     warn "[Warning] No script phases found for #{target_name} target. You can add them in your configuration file at #{configuration_file_path}" unless !script_phases.empty?
     target = app_target(project, target_name)

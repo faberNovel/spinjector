@@ -12,17 +12,30 @@ gem install spinjector
 First, create a YAML configuration file under `./Configuration/spinjector_configuration.yaml` (default path where spinjector looks for a configuration file).
 
 ```
-TargetNameFoo:
-    - <scriptA config path> to inject
-    - <scriptB config path> to inject
-TargetNameBar:
-    - <scriptA config path> to inject
-    - <scriptC config path> to inject
+scripts:
+  foo:
+    name: "Foo"
+    script: |
+      echo Foo
+    execution_position: :after_compile
+
+targets:
+  TargetNameA:
+    - foo
+    - "helloworld.yaml"
+    - "helloworld_explicit_script.yaml"
+  TargetNameB:
+    - "helloworld_short.yaml"
+    - foo
+
 ```
 
 ## Script configuration file
-Then, for each script you want to inject in your Xcode project, create:
-- A configuration file for this script
+Then, for each script you want to inject in your Xcode project:
+- You can use `scripts` section in the global configuration file to define your script directly (eg. `foo`)...
+
+- ...Or create a script configuration file (eg. `helloworld.yaml`)
+
 ```
 name: "Hello World"                  # required. Script phase name.
 
@@ -50,7 +63,7 @@ dependency_file:                     # optional.
 execution_position:                  # optional. [:before-compile | :after-compile | :before-headers | :after-headers].
 ```
 
-- The script file defined under `script_path` in your script configuration file
+- If you use the `script_path option, create the script file
 ```
 echo Hello World
 ```
