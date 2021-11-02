@@ -8,7 +8,7 @@ Gem::Specification.new do |s|
   s.email       = 'guillaume.berthier@fabernovel.com'
   # use `git ls-files -coz -x *.gem` for development
   s.files       = `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(test|spec|features)/}) }
-  s.homepage    = 'https://github.com/guillaumeberthier/spinjector'
+  s.homepage    = 'https://github.com/faberNovel/spinjector'
   s.license     = 'MIT'
 
   s.add_dependency 'optparse', '~> 0.1'
