@@ -6,6 +6,8 @@ require_relative 'script_mapper'
 
 class YAMLParser
 
+    # The configuration to use in order to add scripts in your project
+    #
     attr_reader :configuration
 
     def initialize(yaml_file_path)
@@ -37,7 +39,7 @@ class YAMLParser
             raise "[Error] Could not find script name #{name} in #{@yaml_file_path}"
         end
         script_description = @configuration_description["scripts"][name]
-        get_script_from_description(script_description)
+        ScriptMapper.new(script_description).map()
     end
 
     def get_script_by_path(path)
@@ -45,10 +47,6 @@ class YAMLParser
         if script_description.nil?
             raise "[Error] Could not find script description at path #{path}"
         end
-        get_script_from_description(script_description)
-    end
-
-    def get_script_from_description(script_description)
         ScriptMapper.new(script_description).map()
     end
 

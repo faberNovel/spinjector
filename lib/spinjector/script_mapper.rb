@@ -6,7 +6,7 @@ class ScriptMapper
         @script_hash = script_hash
     end
 
-    def map()
+    def map
         script_code = @script_hash["script"] || load_script(@script_hash["script_path"])
         Script.new(
             @script_hash["name"],

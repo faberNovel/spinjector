@@ -16,6 +16,8 @@ class ProjectService
         @project = project
     end
 
+    # Remove all script phases prefixed by BUILD_PHASE_PREFIX from project
+    #
     def remove_all_scripts
         @project.targets.each do |target|
             # Delete script phases no longer present in the target.
@@ -28,6 +30,8 @@ class ProjectService
         end
     end
 
+    # @param [Configuration] configuration containing all scripts to add in each target
+    #
     def add_scripts_in_targets(configuration)
         configuration.targets.each do |target|
             xcode_target = app_target(target.name)
@@ -37,7 +41,6 @@ class ProjectService
 
     private
 
-    # @param [Xcodeproj::Project] project
     # @param [String] target_name
     # @return [Xcodeproj::Project::Object::PBXNativeTarget] the target named by target_name
     #
