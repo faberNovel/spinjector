@@ -18,35 +18,40 @@ class YAMLParser
     private
 
     def targets
-        @configuration_description["targets"].map do |target_name, script_descriptions|
-            scripts = script_descriptions.map do |script_description|
-                get_script(script_description)
+        if @configuration_description["targets"].nil?
+            puts "[Warning] There is no target in your configuration file."
+            return
+        end
+        @configuration_description["targets"].map do |target_name, script_entries|
+            if script_entries.nil?
+                puts "[Warning] There is no scripts in your configuration file under target #{target_name}"
+                return
+            end
+            scripts = script_entries.map do |entry|
+                get_script(entry)
             end
             Target.new(target_name, scripts)
         end
     end
 
     def get_script(entry)
-        if @configuration_description["scripts"][entry].nil?
-            return get_script_by_path(entry)
-        else
-            return get_script_by_name(entry)
-        end
+        script = 
+            if !@configuration_description["scripts"].nil? && !@configuration_description["scripts"][entry].nil?
+                get_script_by_name(entry)
+            elsif File.exist?(entry)
+                get_script_by_path(entry)
+            else
+                raise "[Error] Script #{entry} does not exist" unless !script.nil?
+            end
     end
 
     def get_script_by_name(name)
-        if @configuration_description["scripts"][name].nil?
-            raise "[Error] Could not find script name #{name} in #{@yaml_file_path}"
-        end
         script_description = @configuration_description["scripts"][name]
         ScriptMapper.new(script_description).map()
     end
 
     def get_script_by_path(path)
         script_description = load_yml_content(path)
-        if script_description.nil?
-            raise "[Error] Could not find script description at path #{path}"
-        end
         ScriptMapper.new(script_description).map()
     end
 

@@ -5,6 +5,6 @@ class Target
 
     def initialize(name, scripts)
         @name = name
-        @scripts = scripts
+        @scripts = scripts || []
     end
 end
