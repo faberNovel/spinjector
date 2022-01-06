@@ -17,9 +17,9 @@ class ScriptMapper
             @script_hash["output_paths"] || [],
             @script_hash["input_file_list_paths"] || [],
             @script_hash["output_file_list_paths"] || [],
-            @script_hash["dependency_file"] || "",
+            @script_hash["dependency_file"],
             @script_hash["execution_position"] || :before_compile,
-            @script_hash["show_env_vars_in_log"] || '0'
+            @script_hash["show_env_vars_in_log"]
         )
     end
 
