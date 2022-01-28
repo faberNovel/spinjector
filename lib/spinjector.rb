@@ -20,15 +20,15 @@ OptionParser.new do |opts|
 end.parse!
 
 project_path = Dir.glob("*.xcodeproj").first
+raise "[Error] No xcodeproj found" unless !project_path.nil?
 project = Xcodeproj::Project.open(project_path)
-raise "[Error] No xcodeproj found" unless !project.nil?
 
 configuration_file_path = options[:configuration_path] || CONFIGURATION_FILE_PATH
 configuration = YAMLParser.new(configuration_file_path).configuration
 
 project_service = ProjectService.new(project)
-project_service.remove_all_scripts()
-project_service.add_scripts_in_targets(configuration)
+project_service.update_scripts_in_targets(configuration)
 
 project.save()
 puts "Success."
+

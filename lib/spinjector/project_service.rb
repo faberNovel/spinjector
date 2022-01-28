@@ -16,61 +16,95 @@ class ProjectService
         @project = project
     end
 
-    # Remove all script phases prefixed by BUILD_PHASE_PREFIX from project
+    # @param [Configuration] configuration containing all scripts to add in each target
     #
-    def remove_all_scripts
+    def update_scripts_in_targets(configuration)
         @project.targets.each do |target|
-            # Delete script phases no longer present in the target.
+            target_configuration = configuration.targets.find { |conf_target| conf_target.name == target.name }
+            if target_configuration == nil
+                remove_all_scripts(target)
+                next
+            end
+            scripts_to_apply = target_configuration.scripts_names.map { |name| BUILD_PHASE_PREFIX + name }.to_set
             native_target_script_phases = target.shell_script_build_phases.select do |bp|
                 !bp.name.nil? && bp.name.start_with?(BUILD_PHASE_PREFIX)
             end
             native_target_script_phases.each do |script_phase|
-                target.build_phases.delete(script_phase)
+                if scripts_to_apply.include?(script_phase.name)
+                  # Update existing script phase with new values
+                  script_configuration = target_configuration.scripts.find { |script|
+                      BUILD_PHASE_PREFIX + script.name == script_phase.name
+                  }
+                  update_script_in_target(script_phase, script_configuration, target)
+                  scripts_to_apply.delete(script_phase.name)
+                elsif
+                  target.build_phases.delete(script_phase)
+                  # Remove now defunct script phase
+                end
             end
-        end
-    end
-
-    # @param [Configuration] configuration containing all scripts to add in each target
-    #
-    def add_scripts_in_targets(configuration)
-        configuration.targets.each do |target|
-            xcode_target = app_target(target.name)
-            add_scripts_in_target(target.scripts, xcode_target)
+            # We may miss scripts that are yet to be added to the pbxproj target, this is fixed in the following method
+            reorder_and_add_missing_script_phases_of(target, target_configuration)
         end
     end
 
     private
 
     # @param [String] target_name
-    # @return [Xcodeproj::Project::Object::PBXNativeTarget] the target named by target_name
     #
-    def app_target(target_name)
-        target = @project.targets.find { |t| t.name == target_name }
-        raise "[Error] Invalid #{target_name} target." unless !target.nil?
-        return target
+    def remove_all_scripts(target)
+        # Delete all the spinjector mangaed scripts from the selected target
+        native_target_script_phases = target.shell_script_build_phases.select do |bp|
+            !bp.name.nil? && bp.name.start_with?(BUILD_PHASE_PREFIX)
+        end
+        native_target_script_phases.each do |script_phase|
+            target.build_phases.delete(script_phase)
+        end
     end
 
-    # @param [Array<Script>] scripts the script phases defined in configuration files
     # @param [Xcodeproj::Project::Object::PBXNativeTarget] target to add the script phases
+    # @param [Target] the target configuration describing the scripts to be added
     #
-    def add_scripts_in_target(scripts, target)
-        scripts.each do |script|
-            name_with_prefix = BUILD_PHASE_PREFIX + script.name
-            phase = target.new_shell_script_build_phase(name_with_prefix)
-            phase.shell_script = script.source_code
-            phase.shell_path = script.shell_path
-            phase.input_paths = script.input_paths
-            phase.output_paths = script.output_paths
-            phase.input_file_list_paths = script.input_file_list_paths
-            phase.output_file_list_paths = script.output_file_list_paths
-            phase.dependency_file = script.dependency_file
-            # At least with Xcode 10 `showEnvVarsInLog` is *NOT* set to any value even if it's checked and it only
-            # gets set to '0' if the user has explicitly disabled this.
-            if script.show_env_vars_in_log == '0'
-                phase.show_env_vars_in_log = script.show_env_vars_in_log
-            end
-            execution_position = script.execution_position
-            reorder_script_phase(target, phase, execution_position)
+    def reorder_and_add_missing_script_phases_of(target, target_configuration)
+      target_configuration.scripts.each do |script|
+        spinjector_managed_phases = target.shell_script_build_phases.select do |bp|
+            !bp.name.nil? && bp.name.start_with?(BUILD_PHASE_PREFIX)
+        end
+        current_phase = spinjector_managed_phases.find { |phase| phase.name == BUILD_PHASE_PREFIX + script.name }
+        if current_phase == nil
+            current_phase = add_script_in_target(script, target)
+        end
+        execution_position = script.execution_position
+        reorder_script_phase(target, current_phase, execution_position)
+      end
+    end
+
+    # @param [Script] script the script phase defined in configuration files to add to the target
+    # @param [Xcodeproj::Project::Object::PBXNativeTarget] target to add the script phases
+    # @return [Xcodeproj::Project::Object::PBXShellScriptBuildPhase] the newly created build phase
+    #
+    def add_script_in_target(script, target)
+        name_with_prefix = BUILD_PHASE_PREFIX + script.name
+        phase = target.new_shell_script_build_phase(name_with_prefix)
+        update_script_in_target(phase, script, target)
+        return phase
+    end
+
+    # @param [Xcodeproj::Project::Object::PBXShellScriptBuildPhase] phase to update with the values from the script
+    # @param [Script] script the script phase defined in configuration files to add to the target
+    # @param [Xcodeproj::Project::Object::PBXNativeTarget] target to add the script phase
+    #
+    def update_script_in_target(existing_phase, script_configuration, target)
+        existing_phase.shell_script = script_configuration.source_code
+        existing_phase.shell_path = script_configuration.shell_path
+        existing_phase.input_paths = script_configuration.input_paths
+        existing_phase.output_paths = script_configuration.output_paths
+        existing_phase.input_file_list_paths = script_configuration.input_file_list_paths
+        existing_phase.output_file_list_paths = script_configuration.output_file_list_paths
+        existing_phase.dependency_file = script_configuration.dependency_file
+        # At least with Xcode 10 `showEnvVarsInLog` is *NOT* set to any value even if it's checked and it only
+        # gets set to '0' if the user has explicitly disabled this.
+        if script_configuration.show_env_vars_in_log == '0'
+            existing_phase.show_env_vars_in_log = script_configuration.show_env_vars_in_log
         end
     end
 
@@ -80,6 +114,12 @@ class ProjectService
     #
     def reorder_script_phase(target, script_phase, execution_position)
         return if execution_position == :any || execution_position.to_s.empty?
+        if execution_position == :after_all
+            puts(script_phase)
+            puts(target)
+            target.build_phases.move(script_phase, target.build_phases.count - 1)
+            return
+        end
     
         # Find the point P where to add the script phase
         target_phase_type = case execution_position
@@ -111,10 +151,13 @@ class ProjectService
         script_phase_index = target.build_phases.index do |bp|
             bp.is_a?(Xcodeproj::Project::Object::PBXShellScriptBuildPhase) && !bp.name.nil? && bp.name == script_phase.name
         end
-    
-        # Move script phase to P if needed
-        if (order_before && script_phase_index > target_phase_index) || (!order_before && script_phase_index < target_phase_index)
-            target.build_phases.move_from(script_phase_index, target_phase_index)
-        end
+
+        offset = order_before ? -1 : 0
+        puts(script_phase.name)
+        puts(script_phase_index)
+        puts(target_phase_index + offset)
+        target.build_phases.move_from(script_phase_index, target_phase_index + offset)
     end
+
 end
+

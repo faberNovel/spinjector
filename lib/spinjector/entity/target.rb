@@ -7,4 +7,8 @@ class Target
         @name = name
         @scripts = scripts || []
     end
+
+    def scripts_names
+        @scripts.map { |script| script.name }
+    end
 end
