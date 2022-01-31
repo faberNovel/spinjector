@@ -20,11 +20,15 @@ class ProjectService
     #
     def update_scripts_in_targets(configuration)
         @project.targets.each do |target|
+            @insertion_offset_after_compile = 0
+            @insertion_offset_after_headers = 0
             target_configuration = configuration.targets.find { |conf_target| conf_target.name == target.name }
             if target_configuration == nil
+                puts "No Spinjector managed build phases in target #{target}"
                 remove_all_scripts(target)
                 next
             end
+            puts "Configurating target #{target}"
             scripts_to_apply = target_configuration.scripts_names.map { |name| BUILD_PHASE_PREFIX + name }.to_set
             native_target_script_phases = target.shell_script_build_phases.select do |bp|
                 !bp.name.nil? && bp.name.start_with?(BUILD_PHASE_PREFIX)
@@ -115,31 +119,28 @@ class ProjectService
     def reorder_script_phase(target, script_phase, execution_position)
         return if execution_position == :any || execution_position.to_s.empty?
         if execution_position == :after_all
-            puts(script_phase)
-            puts(target)
             target.build_phases.move(script_phase, target.build_phases.count - 1)
             return
         end
     
+        offset = -1
         # Find the point P where to add the script phase
         target_phase_type = case execution_position
-                            when :before_compile, :after_compile
+                            when :before_compile
                                 Xcodeproj::Project::Object::PBXSourcesBuildPhase
-                            when :before_headers, :after_headers
+                            when :after_compile
+                                offset = @insertion_offset_after_compile
+                                @insertion_offset_after_compile += 1
+                                Xcodeproj::Project::Object::PBXSourcesBuildPhase
+                            when :before_headers
+                                Xcodeproj::Project::Object::PBXHeadersBuildPhase
+                            when :after_headers
+                                offset = @insertion_offset_after_headers
+                                @insertion_offset_after_headers += 1
                                 Xcodeproj::Project::Object::PBXHeadersBuildPhase
                             else
                                 raise ArgumentError, "Unknown execution position `#{execution_position}`"
                             end
-    
-        # Decide whether to add script_phase before or after point P
-        order_before = case execution_position
-                    when :before_compile, :before_headers
-                        true
-                    when :after_compile, :after_headers
-                        false
-                    else
-                        raise ArgumentError, "Unknown execution position `#{execution_position}`"
-                    end
     
         # Get the first build phase index of P
         target_phase_index = target.build_phases.index do |bp|
@@ -151,11 +152,10 @@ class ProjectService
         script_phase_index = target.build_phases.index do |bp|
             bp.is_a?(Xcodeproj::Project::Object::PBXShellScriptBuildPhase) && !bp.name.nil? && bp.name == script_phase.name
         end
+        if target_phase_index < script_phase_index
+          offset += 1
+        end
 
-        offset = order_before ? -1 : 0
-        puts(script_phase.name)
-        puts(script_phase_index)
-        puts(target_phase_index + offset)
         target.build_phases.move_from(script_phase_index, target_phase_index + offset)
     end
 
