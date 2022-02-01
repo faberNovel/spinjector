@@ -53,14 +53,21 @@ class ProjectService
 
     private
 
-    # @param [String] target_name
+    # @param [Xcodeproj::Project::Object::PBXNativeTarget] target to remove the script phases
+    # @return [<Xcodeproj::Project::Object::PBXShellScriptBuildPhase>] the newly created build phase
     #
-    def remove_all_scripts(target)
-        # Delete all the spinjector mangaed scripts from the selected target
-        native_target_script_phases = target.shell_script_build_phases.select do |bp|
+    def spinjector_managed_phases(target)
+        spinjector_managed_phases = target.shell_script_build_phases.select do |bp|
             !bp.name.nil? && bp.name.start_with?(BUILD_PHASE_PREFIX)
         end
-        native_target_script_phases.each do |script_phase|
+        return spinjector_managed_phases
+    end
+
+    # @param [Xcodeproj::Project::Object::PBXNativeTarget] target to remove the script phases
+    #
+    def remove_all_scripts(target)
+        # Delete all the spinjector managed scripts from the selected target
+        spinjector_managed_phases(target).each do |script_phase|
             target.build_phases.delete(script_phase)
         end
     end
@@ -70,10 +77,7 @@ class ProjectService
     #
     def reorder_and_add_missing_script_phases_of(target, target_configuration)
       target_configuration.scripts.each do |script|
-        spinjector_managed_phases = target.shell_script_build_phases.select do |bp|
-            !bp.name.nil? && bp.name.start_with?(BUILD_PHASE_PREFIX)
-        end
-        current_phase = spinjector_managed_phases.find { |phase| phase.name == BUILD_PHASE_PREFIX + script.name }
+        current_phase = spinjector_managed_phases(target).find { |phase| phase.name == BUILD_PHASE_PREFIX + script.name }
         if current_phase == nil
             current_phase = add_script_in_target(script, target)
         end
