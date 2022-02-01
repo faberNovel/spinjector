@@ -35,15 +35,15 @@ class ProjectService
             end
             native_target_script_phases.each do |script_phase|
                 if scripts_to_apply.include?(script_phase.name)
-                  # Update existing script phase with new values
-                  script_configuration = target_configuration.scripts.find { |script|
-                      BUILD_PHASE_PREFIX + script.name == script_phase.name
-                  }
-                  update_script_in_target(script_phase, script_configuration, target)
-                  scripts_to_apply.delete(script_phase.name)
+                    # Update existing script phase with new values
+                    script_configuration = target_configuration.scripts.find { |script|
+                        BUILD_PHASE_PREFIX + script.name == script_phase.name
+                    }
+                    update_script_in_target(script_phase, script_configuration, target)
+                    scripts_to_apply.delete(script_phase.name)
                 elsif
-                  target.build_phases.delete(script_phase)
-                  # Remove now defunct script phase
+                    target.build_phases.delete(script_phase)
+                    # Remove now defunct script phase
                 end
             end
             # We may miss scripts that are yet to be added to the pbxproj target, this is fixed in the following method
@@ -76,14 +76,14 @@ class ProjectService
     # @param [Target] the target configuration describing the scripts to be added
     #
     def reorder_and_add_missing_script_phases_of(target, target_configuration)
-      target_configuration.scripts.each do |script|
-        current_phase = spinjector_managed_phases(target).find { |phase| phase.name == BUILD_PHASE_PREFIX + script.name }
-        if current_phase == nil
-            current_phase = add_script_in_target(script, target)
+        target_configuration.scripts.each do |script|
+            current_phase = spinjector_managed_phases(target).find { |phase| phase.name == BUILD_PHASE_PREFIX + script.name }
+            if current_phase == nil
+                current_phase = add_script_in_target(script, target)
+            end
+            execution_position = script.execution_position
+            reorder_script_phase(target, current_phase, execution_position)
         end
-        execution_position = script.execution_position
-        reorder_script_phase(target, current_phase, execution_position)
-      end
     end
 
     # @param [Script] script the script phase defined in configuration files to add to the target
