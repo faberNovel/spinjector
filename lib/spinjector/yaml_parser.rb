@@ -11,6 +11,10 @@ class YAMLParser
     attr_reader :configuration
 
     def initialize(yaml_file_path)
+        @inlined_scripts_ids = Set[]
+        @inlined_scripts_names = Set[]
+        @other_scripts_paths = Set[]
+        @other_scripts_names = Set[]
         @configuration_description = load_yml_content(yaml_file_path)
         @configuration = Configuration.new(targets)
     end
@@ -46,13 +50,25 @@ class YAMLParser
     end
 
     def get_script_by_name(name)
+        @inlined_scripts_ids.add(name)
         script_description = @configuration_description["scripts"][name]
-        ScriptMapper.new(script_description).map()
+        script = ScriptMapper.new(script_description).map()
+        @inlined_scripts_names.add(script.name)
+        error = "[Error] Multiple scripts with same name \'#{script.name}\'"
+        raise error unless @inlined_scripts_ids.count == @inlined_scripts_names.count
+        raise error unless !@inlined_scripts_names.intersect?(@other_scripts_names)
+        return script
     end
 
     def get_script_by_path(path)
+        @other_scripts_paths.add(path)
         script_description = load_yml_content(path)
-        ScriptMapper.new(script_description).map()
+        script = ScriptMapper.new(script_description).map()
+        @other_scripts_names.add(script.name)
+        error = "[Error] Multiple scripts with same name \'#{script.name}\'"
+        raise error unless @other_scripts_paths.count == @other_scripts_names.count
+        raise error unless !@inlined_scripts_names.intersect?(@other_scripts_names)
+        return script
     end
 
     # @param [String] configuration_path

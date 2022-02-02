@@ -38,6 +38,8 @@ class Script
             true
         when :after_compile, :after_headers
             false
+        when :after_all,
+            false
         else
             raise ArgumentError, "Unknown execution position `#{execution_position}`"
         end
