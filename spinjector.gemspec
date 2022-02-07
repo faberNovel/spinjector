@@ -14,4 +14,10 @@ Gem::Specification.new do |s|
   s.add_dependency 'optparse', '~> 0.1'
   s.add_dependency 'xcodeproj', '~> 1.21'
   s.add_dependency 'yaml', '~> 0.2'
+
+  s.add_development_dependency 'bundler', '>= 1.12.0', '< 3.0.0'
+  s.add_development_dependency 'rake', '~> 12.3'
+  s.add_development_dependency 'minitest', '~> 5.11'
+  s.add_development_dependency 'minitest-reporters', '~> 1.3'
+  s.add_development_dependency 'minitest-hooks', '~> 1.5'
 end

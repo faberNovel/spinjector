@@ -1,0 +1,10 @@
+scripts:
+  foo:
+    name: "Foo"
+    script: |
+      echo Foo
+    execution_position: :after_compile
+
+targets:
+  Main:
+    - foo
