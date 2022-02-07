@@ -1,4 +1,5 @@
 require 'yaml'
+require 'set'
 require_relative 'entity/configuration'
 require_relative 'entity/script'
 require_relative 'entity/target'
