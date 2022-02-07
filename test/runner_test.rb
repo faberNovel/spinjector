@@ -145,6 +145,26 @@ class YamlParserTest < TestCase
     end
   end
 
+  def test_runner_indempotent
+    copy_empty_project_to_tmp_folder do |project_path|
+      runner = Runner.new(project_path, './test/fixtures/execution.yaml')
+      runner.run
+
+      pbxproj_path = File.join(project_path, 'project.pbxproj')
+      after_first_run_content = File.read(pbxproj_path)
+
+      copy_empty_project_to_tmp_folder(File.dirname(project_path)) do |new_project_path|
+        runner = Runner.new(new_project_path, './test/fixtures/execution.yaml')
+        runner.run
+
+        pbxproj_path = File.join(new_project_path, 'project.pbxproj')
+        after_second_run_content = File.read(pbxproj_path)
+
+        assert_equal after_first_run_content, after_second_run_content
+      end
+    end
+  end
+
   # Private
 
   def copy_empty_project_to_tmp_folder(source = nil)
