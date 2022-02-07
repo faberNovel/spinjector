@@ -1,12 +1,14 @@
 require 'test_helper'
 require_relative '../lib/spinjector/runner'
+require_relative '../lib/spinjector/logger'
 require 'fileutils'
 
+LOGGER = EmptyLogger.new
 class YamlParserTest < TestCase
 
   def test_execution_order_is_correct
     copy_empty_project_to_tmp_folder do |project_path|
-      runner = Runner.new(project_path, './test/fixtures/execution.yaml')
+      runner = Runner.new(project_path, './test/fixtures/execution.yaml', LOGGER)
       runner.run
 
       assert_equal(
@@ -33,7 +35,7 @@ class YamlParserTest < TestCase
         content.gsub('[Test]', '[SPI]')
       end
 
-      runner = Runner.new(project_path, './test/fixtures/empty.yaml')
+      runner = Runner.new(project_path, './test/fixtures/empty.yaml', LOGGER)
       runner.run
 
       assert_equal(
@@ -49,7 +51,7 @@ class YamlParserTest < TestCase
 
   def test_reorder_inner_position
     copy_empty_project_to_tmp_folder do |project_path|
-      runner = Runner.new(project_path, './test/fixtures/change_inner_position_before.yaml')
+      runner = Runner.new(project_path, './test/fixtures/change_inner_position_before.yaml', LOGGER)
       runner.run
 
       assert_equal(
@@ -70,7 +72,7 @@ class YamlParserTest < TestCase
       )
 
       copy_empty_project_to_tmp_folder(File.dirname(project_path)) do |reorder_project_path|
-        runner = Runner.new(reorder_project_path, './test/fixtures/change_inner_position_after.yaml')
+        runner = Runner.new(reorder_project_path, './test/fixtures/change_inner_position_after.yaml', LOGGER)
         runner.run
 
         assert_equal(
@@ -95,7 +97,7 @@ class YamlParserTest < TestCase
 
   def test_reorder_outer_position
     copy_empty_project_to_tmp_folder do |project_path|
-      runner = Runner.new(project_path, './test/fixtures/change_outer_position_before.yaml')
+      runner = Runner.new(project_path, './test/fixtures/change_outer_position_before.yaml', LOGGER)
       runner.run
 
       assert_equal(
@@ -119,7 +121,7 @@ class YamlParserTest < TestCase
       )
 
       copy_empty_project_to_tmp_folder(File.dirname(project_path)) do |reorder_project_path|
-        runner = Runner.new(reorder_project_path, './test/fixtures/change_outer_position_after.yaml')
+        runner = Runner.new(reorder_project_path, './test/fixtures/change_outer_position_after.yaml', LOGGER)
         runner.run
 
         assert_equal(
@@ -147,14 +149,14 @@ class YamlParserTest < TestCase
 
   def test_runner_indempotent
     copy_empty_project_to_tmp_folder do |project_path|
-      runner = Runner.new(project_path, './test/fixtures/execution.yaml')
+      runner = Runner.new(project_path, './test/fixtures/execution.yaml', LOGGER)
       runner.run
 
       pbxproj_path = File.join(project_path, 'project.pbxproj')
       after_first_run_content = File.read(pbxproj_path)
 
       copy_empty_project_to_tmp_folder(File.dirname(project_path)) do |new_project_path|
-        runner = Runner.new(new_project_path, './test/fixtures/execution.yaml')
+        runner = Runner.new(new_project_path, './test/fixtures/execution.yaml', LOGGER)
         runner.run
 
         pbxproj_path = File.join(new_project_path, 'project.pbxproj')

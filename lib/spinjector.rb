@@ -6,6 +6,7 @@
 require 'optparse'
 require 'xcodeproj'
 require_relative 'spinjector/runner'
+require_relative 'spinjector/logger'
 
 CONFIGURATION_FILE_PATH = 'Configuration/spinjector_configuration.yaml'.freeze
 
@@ -23,6 +24,7 @@ raise "[Error] No xcodeproj found in #{Dir.pwd}" if project_path.nil?
 
 runner = Runner.new(
   project_path,
-  options[:configuration_path] || CONFIGURATION_FILE_PATH
+  options[:configuration_path] || CONFIGURATION_FILE_PATH,
+  VerboseLogger.new
 )
 runner.run

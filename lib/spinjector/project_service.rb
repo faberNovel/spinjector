@@ -12,8 +12,9 @@ class ProjectService
 
     # @param [Xcodeproj::Project] project
     #
-    def initialize(project)
+    def initialize(project, logger)
         @project = project
+        @logger = logger
     end
 
     # @param [Configuration] configuration containing all scripts to add in each target
@@ -24,11 +25,11 @@ class ProjectService
             @insertion_offset_after_headers = 0
             target_configuration = configuration.targets.find { |conf_target| conf_target.name == target.name }
             if target_configuration == nil
-                puts "No Spinjector managed build phases in target #{target}"
+                @logger.log "No Spinjector managed build phases in target #{target}"
                 remove_all_scripts(target)
                 next
             end
-            puts "Configurating target #{target}"
+            @logger.log "Configurating target #{target}"
             scripts_to_apply = target_configuration.scripts_names.map { |name| BUILD_PHASE_PREFIX + name }.to_set
             native_target_script_phases = target.shell_script_build_phases.select do |bp|
                 !bp.name.nil? && bp.name.start_with?(BUILD_PHASE_PREFIX)
