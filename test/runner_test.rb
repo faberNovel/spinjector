@@ -47,11 +47,110 @@ class YamlParserTest < TestCase
     end
   end
 
+  def test_reorder_inner_position
+    copy_empty_project_to_tmp_folder do |project_path|
+      runner = Runner.new(project_path, './test/fixtures/change_inner_position_before.yaml')
+      runner.run
+
+      assert_equal(
+        runner.project.targets.first.build_phases.map(&:display_name),
+        [
+          "[Test] BeforeCompile",
+          "Sources",
+          "[SPI] AfterCompile1",
+          "[SPI] AfterCompile2",
+          "[SPI] AfterCompile3",
+          "[Test] AfterCompile",
+          "Frameworks",
+          "Resources",
+          "[Test] AfterAll",
+          "[SPI] AfterHeaders1",
+          "[SPI] AfterHeaders2"
+        ]
+      )
+
+      copy_empty_project_to_tmp_folder(File.dirname(project_path)) do |reorder_project_path|
+        runner = Runner.new(reorder_project_path, './test/fixtures/change_inner_position_after.yaml')
+        runner.run
+
+        assert_equal(
+          runner.project.targets.first.build_phases.map(&:display_name),
+          [
+            "[Test] BeforeCompile",
+            "Sources",
+            "[SPI] AfterCompile3",
+            "[SPI] AfterCompile1",
+            "[SPI] AfterCompile2",
+            "[Test] AfterCompile",
+            "Frameworks",
+            "Resources",
+            "[Test] AfterAll",
+            "[SPI] AfterHeaders2",
+            "[SPI] AfterHeaders1"
+          ]
+        )
+      end
+    end
+  end
+
+  def test_reorder_outer_position
+    copy_empty_project_to_tmp_folder do |project_path|
+      runner = Runner.new(project_path, './test/fixtures/change_outer_position_before.yaml')
+      runner.run
+
+      assert_equal(
+        runner.project.targets.first.build_phases.map(&:display_name),
+        [
+          "[Test] BeforeCompile",
+          "[SPI] BeforeCompileToBeforeCompile",
+          "[SPI] BeforeCompileToAfterCompile",
+          "Sources",
+          "[SPI] AfterCompileToBeforeCompile",
+          "[SPI] AfterCompileToAfterCompile",
+          "[Test] AfterCompile",
+          "Frameworks",
+          "Resources",
+          "[Test] AfterAll",
+          "[SPI] BeforeHeadersToBeforeHeaders",
+          "[SPI] BeforeHeadersToAfterHeaders",
+          "[SPI] AfterHeadersToBeforeHeaders",
+          "[SPI] AfterHeadersToAfterHeaders"
+        ]
+      )
+
+      copy_empty_project_to_tmp_folder(File.dirname(project_path)) do |reorder_project_path|
+        runner = Runner.new(reorder_project_path, './test/fixtures/change_outer_position_after.yaml')
+        runner.run
+
+        assert_equal(
+          runner.project.targets.first.build_phases.map(&:display_name),
+          [
+            "[Test] BeforeCompile",
+            "[SPI] BeforeCompileToBeforeCompile",
+            "[SPI] AfterCompileToBeforeCompile",
+            "Sources",
+            "[SPI] BeforeCompileToAfterCompile",
+            "[SPI] AfterCompileToAfterCompile",
+            "[Test] AfterCompile",
+            "Frameworks",
+            "Resources",
+            "[Test] AfterAll",
+            "[SPI] BeforeHeadersToBeforeHeaders",
+            "[SPI] AfterHeadersToBeforeHeaders",
+            "[SPI] BeforeHeadersToAfterHeaders",
+            "[SPI] AfterHeadersToAfterHeaders"
+          ]
+        )
+      end
+    end
+  end
+
   # Private
 
-  def copy_empty_project_to_tmp_folder
+  def copy_empty_project_to_tmp_folder(source = nil)
+    source = source || './test/fixtures/EmptyProject'
     Dir.mktmpdir("spinjector") do |dir|
-      FileUtils.copy_entry './test/fixtures/EmptyProject', dir
+      FileUtils.copy_entry source, dir
       yield File.join(dir, 'EmptyProject.xcodeproj')
     end
   end

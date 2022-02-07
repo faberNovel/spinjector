@@ -1,0 +1,52 @@
+scripts:
+  before_compile_to_after_compile:
+    name: "BeforeCompileToAfterCompile"
+    script: |
+      echo before_compile_to_after_compile
+    execution_position: :after_compile
+  before_compile_to_before_compile:
+    name: "BeforeCompileToBeforeCompile"
+    script: |
+      echo before_compile_to_before_compile
+    execution_position: :before_compile
+  after_compile_to_before_compile:
+    name: "AfterCompileToBeforeCompile"
+    script: |
+      echo after_compile_to_before_compile
+    execution_position: :before_compile
+  after_compile_to_after_compile:
+    name: "AfterCompileToAfterCompile"
+    script: |
+      echo after_compile_to_after_compile
+    execution_position: :after_compile
+  before_headers_to_after_headers:
+    name: "BeforeHeadersToAfterHeaders"
+    script: |
+      echo before_headers_to_after_headers
+    execution_position: :after_headers
+  before_headers_to_before_headers:
+    name: "BeforeHeadersToBeforeHeaders"
+    script: |
+      echo before_headers_to_before_headers
+    execution_position: :before_headers
+  after_headers_to_before_headers:
+    name: "AfterHeadersToBeforeHeaders"
+    script: |
+      echo after_headers_to_before_headers
+    execution_position: :before_headers
+  after_headers_to_after_headers:
+    name: "AfterHeadersToAfterHeaders"
+    script: |
+      echo after_headers_to_after_headers
+    execution_position: :after_headers
+
+targets:
+  EmptyProject:
+    - before_compile_to_after_compile
+    - before_compile_to_before_compile
+    - after_compile_to_before_compile
+    - after_compile_to_after_compile
+    - before_headers_to_after_headers
+    - before_headers_to_before_headers
+    - after_headers_to_before_headers
+    - after_headers_to_after_headers
