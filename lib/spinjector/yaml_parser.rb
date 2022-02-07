@@ -40,7 +40,7 @@ class YAMLParser
     end
 
     def get_script(entry)
-        script = 
+        script =
             if !@configuration_description["scripts"].nil? && !@configuration_description["scripts"][entry].nil?
                 get_script_by_name(entry)
             elsif File.exist?(entry)

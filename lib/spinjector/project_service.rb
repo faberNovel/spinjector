@@ -126,7 +126,7 @@ class ProjectService
             target.build_phases.move(script_phase, target.build_phases.count - 1)
             return
         end
-    
+
         offset = -1
         # Find the point P where to add the script phase
         target_phase_type = case execution_position
@@ -145,13 +145,13 @@ class ProjectService
                             else
                                 raise ArgumentError, "Unknown execution position `#{execution_position}`"
                             end
-    
+
         # Get the first build phase index of P
         target_phase_index = target.build_phases.index do |bp|
             bp.is_a?(target_phase_type)
         end
         return if target_phase_index.nil?
-    
+
         # Get the script phase we want to reorder index
         script_phase_index = target.build_phases.index do |bp|
             bp.is_a?(Xcodeproj::Project::Object::PBXShellScriptBuildPhase) && !bp.name.nil? && bp.name == script_phase.name
