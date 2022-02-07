@@ -4,7 +4,7 @@ require_relative '../lib/spinjector/logger'
 require 'fileutils'
 
 LOGGER = EmptyLogger.new
-class YamlParserTest < TestCase
+class RunnerParserTest < TestCase
 
   def test_execution_order_is_correct
     copy_empty_project_to_tmp_folder do |project_path|
