@@ -5,8 +5,7 @@
 
 require 'optparse'
 require 'xcodeproj'
-require_relative 'spinjector/project_service'
-require_relative 'spinjector/yaml_parser'
+require_relative 'spinjector/runner'
 
 CONFIGURATION_FILE_PATH = 'Configuration/spinjector_configuration.yaml'.freeze
 
@@ -20,15 +19,10 @@ OptionParser.new do |opts|
 end.parse!
 
 project_path = Dir.glob("*.xcodeproj").first
-raise "[Error] No xcodeproj found" unless !project_path.nil?
-project = Xcodeproj::Project.open(project_path)
+raise "[Error] No xcodeproj found in #{Dir.pwd}" if project_path.nil?
 
-configuration_file_path = options[:configuration_path] || CONFIGURATION_FILE_PATH
-configuration = YAMLParser.new(configuration_file_path).configuration
-
-project_service = ProjectService.new(project)
-project_service.update_scripts_in_targets(configuration)
-
-project.save()
-puts "Success."
-
+runner = Runner.new(
+  project_path,
+  options[:configuration_path] || CONFIGURATION_FILE_PATH
+)
+runner.run

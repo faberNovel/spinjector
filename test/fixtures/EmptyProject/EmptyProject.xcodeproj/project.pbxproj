@@ -76,9 +76,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 49BCC9FA27B138E300E0C965 /* Build configuration list for PBXNativeTarget "EmptyProject" */;
 			buildPhases = (
+				49BCC9FD27B163C800E0C965 /* [Test] BeforeCompile */,
 				49BCC9E727B138E000E0C965 /* Sources */,
+				49BCC9FE27B1640E00E0C965 /* [Test] AfterCompile */,
 				49BCC9E827B138E000E0C965 /* Frameworks */,
 				49BCC9E927B138E000E0C965 /* Resources */,
+				49BCC9FF27B1645900E0C965 /* [Test] AfterAll */,
 			);
 			buildRules = (
 			);
@@ -132,6 +135,63 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		49BCC9FD27B163C800E0C965 /* [Test] BeforeCompile */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "[Test] BeforeCompile";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\n";
+		};
+		49BCC9FE27B1640E00E0C965 /* [Test] AfterCompile */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "[Test] AfterCompile";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "";
+		};
+		49BCC9FF27B1645900E0C965 /* [Test] AfterAll */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "[Test] AfterAll";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		49BCC9E727B138E000E0C965 /* Sources */ = {
