@@ -43,6 +43,7 @@ class RunnerParserTest < TestCase
           "Resources",
           "Embed Frameworks",
           "[Test] AfterAll",
+          "[SPI] AfterAll",
         ]
       )
       assert_equal(
@@ -61,6 +62,7 @@ class RunnerParserTest < TestCase
           "Frameworks",
           "Resources",
           "[Test] AfterAll",
+          "[SPI] AfterAll",
         ]
       )
     end
@@ -114,6 +116,7 @@ class RunnerParserTest < TestCase
           "Resources",
           "Embed Frameworks",
           "[Test] AfterAll",
+          "[SPI] AfterAll",
         ]
       )
       assert_equal(
@@ -132,7 +135,8 @@ class RunnerParserTest < TestCase
           "[Test] AfterCompile",
           "Frameworks",
           "Resources",
-          "[Test] AfterAll"
+          "[Test] AfterAll",
+          "[SPI] AfterAll",
         ]
       )
 
@@ -153,6 +157,7 @@ class RunnerParserTest < TestCase
             "Resources",
             "Embed Frameworks",
             "[Test] AfterAll",
+            "[SPI] AfterAll",
           ]
         )
         assert_equal(
@@ -171,7 +176,8 @@ class RunnerParserTest < TestCase
             "[Test] AfterCompile",
             "Frameworks",
             "Resources",
-            "[Test] AfterAll"
+            "[Test] AfterAll",
+            "[SPI] AfterAll",
           ]
         )
       end
@@ -197,6 +203,7 @@ class RunnerParserTest < TestCase
           "Resources",
           "Embed Frameworks",
           "[Test] AfterAll",
+          "[SPI] AfterAll",
         ]
       )
       assert_equal(
@@ -219,6 +226,7 @@ class RunnerParserTest < TestCase
           "Frameworks",
           "Resources",
           "[Test] AfterAll",
+          "[SPI] AfterAll",
         ]
       )
 
@@ -240,6 +248,7 @@ class RunnerParserTest < TestCase
             "Resources",
             "Embed Frameworks",
             "[Test] AfterAll",
+            "[SPI] AfterAll",
           ]
         )
         assert_equal(
@@ -262,6 +271,7 @@ class RunnerParserTest < TestCase
             "Frameworks",
             "Resources",
             "[Test] AfterAll",
+            "[SPI] AfterAll",
           ]
         )
       end

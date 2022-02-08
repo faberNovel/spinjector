@@ -39,6 +39,11 @@ scripts:
     script: |
       echo after_headers_to_after_headers
     execution_position: :after_headers
+  after_all:
+    name: "AfterAll"
+    script: |
+      echo after_all
+    execution_position: :after_all
 
 targets:
   EmptyProject:
@@ -50,6 +55,7 @@ targets:
     - before_headers_to_before_headers
     - after_headers_to_before_headers
     - after_headers_to_after_headers
+    - after_all
   Framework:
     - before_compile_to_after_compile
     - before_compile_to_before_compile
@@ -59,3 +65,4 @@ targets:
     - before_headers_to_before_headers
     - after_headers_to_before_headers
     - after_headers_to_after_headers
+    - after_all

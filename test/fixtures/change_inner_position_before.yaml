@@ -24,6 +24,11 @@ scripts:
     script: |
       echo after_headers2
     execution_position: :after_headers
+  after_all:
+    name: "AfterAll"
+    script: |
+      echo after_all
+    execution_position: :after_all
 
 targets:
   EmptyProject:
@@ -32,9 +37,11 @@ targets:
     - after_compile3
     - after_headers1
     - after_headers2
+    - after_all
   Framework:
     - after_compile1
     - after_compile2
     - after_compile3
     - after_headers1
     - after_headers2
+    - after_all

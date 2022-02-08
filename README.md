@@ -65,7 +65,7 @@ output_file_list_paths:              # optional.
 
 dependency_file:                     # optional.
 
-execution_position:                  # optional. [:before_compile | :after_compile | :before_headers | :after_headers].
+execution_position:                  # optional. [:before_compile | :after_compile | :before_headers | :after_headers | :after_all].
 ```
 
 - If you use the `script_path option`, create the script file
