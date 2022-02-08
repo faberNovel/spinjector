@@ -79,12 +79,35 @@ class ProjectService
     def reorder_and_add_missing_script_phases_of(target, target_configuration)
         target_configuration.scripts.each do |script|
             current_phase = spinjector_managed_phases(target).find { |phase| phase.name == BUILD_PHASE_PREFIX + script.name }
-            if current_phase == nil
+            if current_phase == nil && should_add_script_in_target(script, target)
                 current_phase = add_script_in_target(script, target)
             end
             execution_position = script.execution_position
             reorder_script_phase(target, current_phase, execution_position)
         end
+    end
+
+    # Checks If the target contains a build phase associated to the script execution position
+    # For instance, it checks if the Headers build phase is present when the script has a :after_headers position
+    # @param [Script] script the script phase defined in configuration files to add to the target
+    # @param [Xcodeproj::Project::Object::PBXNativeTarget] target to add the script phases
+    # @return [Boolean] If the script should be added to the target
+    #
+    def should_add_script_in_target(script, target)
+        return true if script.execution_position === :after_all
+
+        target_phase_type = case script.execution_position
+            when :before_compile, :after_compile
+                Xcodeproj::Project::Object::PBXSourcesBuildPhase
+            when :before_headers, :after_headers
+                Xcodeproj::Project::Object::PBXHeadersBuildPhase
+            else
+                nil
+            end
+
+        found_phase_in_target = target.build_phases.find { |bp| bp.is_a?(target_phase_type) }
+        @logger.log("Can't find build phase associated to execution position #{script.execution_position} in target #{target.name}") if found_phase_in_target.nil?
+        return !found_phase_in_target.nil?
     end
 
     # @param [Script] script the script phase defined in configuration files to add to the target
@@ -122,7 +145,7 @@ class ProjectService
     # @param [Symbol] execution_position could be :before_compile, :after_compile, :before_headers, :after_headers
     #
     def reorder_script_phase(target, script_phase, execution_position)
-        return if execution_position == :any || execution_position.to_s.empty?
+        return if execution_position == :any || execution_position.to_s.empty? || script_phase.nil?
         if execution_position == :after_all
             target.build_phases.move(script_phase, target.build_phases.count - 1)
             return

@@ -50,3 +50,12 @@ targets:
     - before_headers_to_after_headers
     - after_headers_to_before_headers
     - after_headers_to_after_headers
+  Framework:
+    - before_compile_to_before_compile
+    - before_compile_to_after_compile
+    - after_compile_to_before_compile
+    - after_compile_to_after_compile
+    - before_headers_to_before_headers
+    - before_headers_to_after_headers
+    - after_headers_to_before_headers
+    - after_headers_to_after_headers

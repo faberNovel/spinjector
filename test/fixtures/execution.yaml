@@ -26,3 +26,8 @@ targets:
     - after_compile
     - before_headers
     - after_headers
+  Framework:
+    - before_compile
+    - after_compile
+    - before_headers
+    - after_headers

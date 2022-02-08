@@ -32,3 +32,9 @@ targets:
     - after_compile2
     - after_headers2
     - after_headers1
+  Framework:
+    - after_compile3
+    - after_compile1
+    - after_compile2
+    - after_headers2
+    - after_headers1

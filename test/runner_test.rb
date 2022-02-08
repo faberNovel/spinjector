@@ -2,8 +2,28 @@ require 'test_helper'
 require_relative '../lib/spinjector/runner'
 require_relative '../lib/spinjector/logger'
 require 'fileutils'
+require 'xcodeproj'
 
 LOGGER = EmptyLogger.new
+
+class Xcodeproj::Project
+
+  def ft_main_target
+    targets.find { |t| t.name === "EmptyProject" }
+  end
+
+  def ft_framework_target
+    targets.find { |t| t.name === "Framework" }
+  end
+end
+
+class Xcodeproj::Project::Object::PBXNativeTarget
+
+  def ft_build_phases_names
+    build_phases.map(&:display_name)
+  end
+end
+
 class RunnerParserTest < TestCase
 
   def test_execution_order_is_correct
@@ -12,7 +32,7 @@ class RunnerParserTest < TestCase
       runner.run
 
       assert_equal(
-        runner.project.targets.first.build_phases.map(&:display_name),
+        runner.project.ft_main_target.ft_build_phases_names,
         [
           "[Test] BeforeCompile",
           "[SPI] BeforeCompile",
@@ -21,9 +41,26 @@ class RunnerParserTest < TestCase
           "[Test] AfterCompile",
           "Frameworks",
           "Resources",
+          "Embed Frameworks",
           "[Test] AfterAll",
+        ]
+      )
+      assert_equal(
+        runner.project.ft_framework_target.ft_build_phases_names,
+        [
+          "[Test] BeforeHeaders",
           "[SPI] BeforeHeaders",
+          "Headers",
           "[SPI] AfterHeaders",
+          "[Test] AfterHeaders",
+          "[Test] BeforeCompile",
+          "[SPI] BeforeCompile",
+          "Sources",
+          "[SPI] AfterCompile",
+          "[Test] AfterCompile",
+          "Frameworks",
+          "Resources",
+          "[Test] AfterAll",
         ]
       )
     end
@@ -39,8 +76,18 @@ class RunnerParserTest < TestCase
       runner.run
 
       assert_equal(
-        runner.project.targets.first.build_phases.map(&:display_name),
+        runner.project.ft_main_target.ft_build_phases_names,
         [
+          "Sources",
+          "Frameworks",
+          "Resources",
+          "Embed Frameworks",
+        ]
+      )
+      assert_equal(
+        runner.project.ft_framework_target.ft_build_phases_names,
+        [
+          "Headers",
           "Sources",
           "Frameworks",
           "Resources",
@@ -55,7 +102,7 @@ class RunnerParserTest < TestCase
       runner.run
 
       assert_equal(
-        runner.project.targets.first.build_phases.map(&:display_name),
+        runner.project.ft_main_target.ft_build_phases_names,
         [
           "[Test] BeforeCompile",
           "Sources",
@@ -65,9 +112,27 @@ class RunnerParserTest < TestCase
           "[Test] AfterCompile",
           "Frameworks",
           "Resources",
+          "Embed Frameworks",
           "[Test] AfterAll",
+        ]
+      )
+      assert_equal(
+        runner.project.ft_framework_target.ft_build_phases_names,
+        [
+          "[Test] BeforeHeaders",
+          "Headers",
           "[SPI] AfterHeaders1",
-          "[SPI] AfterHeaders2"
+          "[SPI] AfterHeaders2",
+          "[Test] AfterHeaders",
+          "[Test] BeforeCompile",
+          "Sources",
+          "[SPI] AfterCompile1",
+          "[SPI] AfterCompile2",
+          "[SPI] AfterCompile3",
+          "[Test] AfterCompile",
+          "Frameworks",
+          "Resources",
+          "[Test] AfterAll"
         ]
       )
 
@@ -76,7 +141,7 @@ class RunnerParserTest < TestCase
         runner.run
 
         assert_equal(
-          runner.project.targets.first.build_phases.map(&:display_name),
+          runner.project.ft_main_target.ft_build_phases_names,
           [
             "[Test] BeforeCompile",
             "Sources",
@@ -86,9 +151,27 @@ class RunnerParserTest < TestCase
             "[Test] AfterCompile",
             "Frameworks",
             "Resources",
+            "Embed Frameworks",
             "[Test] AfterAll",
+          ]
+        )
+        assert_equal(
+          runner.project.ft_framework_target.ft_build_phases_names,
+          [
+            "[Test] BeforeHeaders",
+            "Headers",
             "[SPI] AfterHeaders2",
-            "[SPI] AfterHeaders1"
+            "[SPI] AfterHeaders1",
+            "[Test] AfterHeaders",
+            "[Test] BeforeCompile",
+            "Sources",
+            "[SPI] AfterCompile3",
+            "[SPI] AfterCompile1",
+            "[SPI] AfterCompile2",
+            "[Test] AfterCompile",
+            "Frameworks",
+            "Resources",
+            "[Test] AfterAll"
           ]
         )
       end
@@ -101,7 +184,7 @@ class RunnerParserTest < TestCase
       runner.run
 
       assert_equal(
-        runner.project.targets.first.build_phases.map(&:display_name),
+        runner.project.ft_main_target.ft_build_phases_names,
         [
           "[Test] BeforeCompile",
           "[SPI] BeforeCompileToBeforeCompile",
@@ -112,11 +195,30 @@ class RunnerParserTest < TestCase
           "[Test] AfterCompile",
           "Frameworks",
           "Resources",
+          "Embed Frameworks",
           "[Test] AfterAll",
+        ]
+      )
+      assert_equal(
+        runner.project.ft_framework_target.ft_build_phases_names,
+        [
+          "[Test] BeforeHeaders",
           "[SPI] BeforeHeadersToBeforeHeaders",
           "[SPI] BeforeHeadersToAfterHeaders",
+          "Headers",
           "[SPI] AfterHeadersToBeforeHeaders",
-          "[SPI] AfterHeadersToAfterHeaders"
+          "[SPI] AfterHeadersToAfterHeaders",
+          "[Test] AfterHeaders",
+          "[Test] BeforeCompile",
+          "[SPI] BeforeCompileToBeforeCompile",
+          "[SPI] BeforeCompileToAfterCompile",
+          "Sources",
+          "[SPI] AfterCompileToBeforeCompile",
+          "[SPI] AfterCompileToAfterCompile",
+          "[Test] AfterCompile",
+          "Frameworks",
+          "Resources",
+          "[Test] AfterAll",
         ]
       )
 
@@ -125,7 +227,7 @@ class RunnerParserTest < TestCase
         runner.run
 
         assert_equal(
-          runner.project.targets.first.build_phases.map(&:display_name),
+          runner.project.ft_main_target.ft_build_phases_names,
           [
             "[Test] BeforeCompile",
             "[SPI] BeforeCompileToBeforeCompile",
@@ -136,11 +238,30 @@ class RunnerParserTest < TestCase
             "[Test] AfterCompile",
             "Frameworks",
             "Resources",
+            "Embed Frameworks",
             "[Test] AfterAll",
+          ]
+        )
+        assert_equal(
+          runner.project.ft_framework_target.ft_build_phases_names,
+          [
+            "[Test] BeforeHeaders",
             "[SPI] BeforeHeadersToBeforeHeaders",
             "[SPI] AfterHeadersToBeforeHeaders",
+            "Headers",
             "[SPI] BeforeHeadersToAfterHeaders",
-            "[SPI] AfterHeadersToAfterHeaders"
+            "[SPI] AfterHeadersToAfterHeaders",
+            "[Test] AfterHeaders",
+            "[Test] BeforeCompile",
+            "[SPI] BeforeCompileToBeforeCompile",
+            "[SPI] AfterCompileToBeforeCompile",
+            "Sources",
+            "[SPI] BeforeCompileToAfterCompile",
+            "[SPI] AfterCompileToAfterCompile",
+            "[Test] AfterCompile",
+            "Frameworks",
+            "Resources",
+            "[Test] AfterAll",
           ]
         )
       end
