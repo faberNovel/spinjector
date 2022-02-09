@@ -278,7 +278,7 @@ class RunnerParserTest < TestCase
     end
   end
 
-  def test_runner_indempotent
+  def test_runner_idempotent
     copy_empty_project_to_tmp_folder do |project_path|
       runner = Runner.new(project_path, './test/fixtures/execution.yaml', LOGGER)
       runner.run
