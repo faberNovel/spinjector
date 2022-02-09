@@ -1,0 +1,47 @@
+scripts:
+  after_compile1:
+    name: "AfterCompile1"
+    script: |
+      echo after_compile1
+    execution_position: :after_compile
+  after_compile2:
+    name: "AfterCompile2"
+    script: |
+      echo after_compile2
+    execution_position: :after_compile
+  after_compile3:
+    name: "AfterCompile3"
+    script: |
+      echo after_compile3
+    execution_position: :after_compile
+  after_headers1:
+    name: "AfterHeaders1"
+    script: |
+      echo after_headers1
+    execution_position: :after_headers
+  after_headers2:
+    name: "AfterHeaders2"
+    script: |
+      echo after_headers2
+    execution_position: :after_headers
+  after_all:
+    name: "AfterAll"
+    script: |
+      echo after_all
+    execution_position: :after_all
+
+targets:
+  EmptyProject:
+    - after_compile3
+    - after_compile1
+    - after_compile2
+    - after_headers2
+    - after_headers1
+    - after_all
+  Framework:
+    - after_compile3
+    - after_compile1
+    - after_compile2
+    - after_headers2
+    - after_headers1
+    - after_all

@@ -1,4 +1,5 @@
 require 'yaml'
+require 'set'
 require_relative 'entity/configuration'
 require_relative 'entity/script'
 require_relative 'entity/target'
@@ -10,7 +11,8 @@ class YAMLParser
     #
     attr_reader :configuration
 
-    def initialize(yaml_file_path)
+    def initialize(yaml_file_path, logger)
+        @logger = logger
         @inlined_scripts_ids = Set[]
         @inlined_scripts_names = Set[]
         @other_scripts_paths = Set[]
@@ -23,12 +25,12 @@ class YAMLParser
 
     def targets
         if @configuration_description["targets"].nil?
-            puts "[Warning] There is no target in your configuration file."
+            @logger.log "[Warning] There is no target in your configuration file."
             return
         end
         @configuration_description["targets"].map do |target_name, script_entries|
             if script_entries.nil?
-                puts "[Warning] There is no scripts in your configuration file under target #{target_name}"
+                @logger.log "[Warning] There is no scripts in your configuration file under target #{target_name}"
                 return
             end
             scripts = script_entries.map do |entry|
@@ -39,7 +41,7 @@ class YAMLParser
     end
 
     def get_script(entry)
-        script = 
+        script =
             if !@configuration_description["scripts"].nil? && !@configuration_description["scripts"][entry].nil?
                 get_script_by_name(entry)
             elsif File.exist?(entry)

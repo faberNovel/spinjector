@@ -1,0 +1,40 @@
+scripts:
+  before_compile:
+    name: "BeforeCompile"
+    script: |
+      echo before_compile
+    execution_position: :before_compile
+  after_compile:
+    name: "AfterCompile"
+    script: |
+      echo after_compile
+    execution_position: :after_compile
+  before_headers:
+    name: "BeforeHeaders"
+    script: |
+      echo before_headers
+    execution_position: :before_headers
+  after_headers:
+    name: "AfterHeaders"
+    script: |
+      echo after_headers
+    execution_position: :after_headers
+  after_all:
+    name: "AfterAll"
+    script: |
+      echo after_all
+    execution_position: :after_all
+
+targets:
+  EmptyProject:
+    - before_compile
+    - after_compile
+    - before_headers
+    - after_headers
+    - after_all
+  Framework:
+    - before_compile
+    - after_compile
+    - before_headers
+    - after_headers
+    - after_all
