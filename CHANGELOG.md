@@ -14,6 +14,7 @@ All notable changes to this project will be documented in this file.
 
 ### Created
 
+- Added an after_all option for the script position
 - Make the script idempotent. Successive calls to configure don’t modify the pbxproj file anymore
 - Added tests
 
