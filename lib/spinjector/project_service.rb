@@ -137,9 +137,13 @@ class ProjectService
         # gets set to '0' if the user has explicitly disabled this.
         if script_configuration.show_env_vars_in_log == '0'
             existing_phase.show_env_vars_in_log = script_configuration.show_env_vars_in_log
+        else
+            existing_phase.show_env_vars_in_log = nil
         end
         if script_configuration.always_out_of_date == '1'
             existing_phase.always_out_of_date = script_configuration.always_out_of_date
+        else
+            existing_phase.always_out_of_date = nil
         end
     end
 
