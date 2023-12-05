@@ -1,5 +1,10 @@
+.PHONY: test
+
 build:
 	gem build spinjector.gemspec
+
+test:
+	bundle exec rake test
 
 install: clean build
 	gem install spinjector-*.gem

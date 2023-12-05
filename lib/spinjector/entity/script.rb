@@ -1,7 +1,7 @@
 
 class Script
 
-    attr_reader :name, :source_code, :shell_path, :input_paths, :output_paths, :input_file_list_paths, :output_file_list_paths, :dependency_file, :execution_position, :show_env_vars_in_log
+    attr_reader :name, :source_code, :shell_path, :input_paths, :output_paths, :input_file_list_paths, :output_file_list_paths, :dependency_file, :execution_position, :show_env_vars_in_log, :always_out_of_date
 
     def initialize(
         name,
@@ -13,7 +13,8 @@ class Script
         output_file_list_paths,
         dependency_file,
         execution_position,
-        show_env_vars_in_log
+        show_env_vars_in_log,
+        always_out_of_date
     )
         @name = name
         @source_code = source_code
@@ -25,6 +26,7 @@ class Script
         @dependency_file = dependency_file
         @execution_position = execution_position
         @show_env_vars_in_log = show_env_vars_in_log
+        @always_out_of_date = always_out_of_date
         verify()
     end
 
