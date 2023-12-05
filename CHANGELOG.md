@@ -6,11 +6,15 @@ All notable changes to this project will be documented in this file.
 
 ### Created
 
-- Added `always_out_of_date` option to script to make Xcode always run them without dependency analysis.
-
 ### Fixed
 
 ### Removed
+
+## [1.1.0] - 2023-12-05
+
+### Created
+
+- Added `always_out_of_date` option to script to make Xcode always run them without dependency analysis.
 
 ## [1.0.0] - 2022-12-19
 
