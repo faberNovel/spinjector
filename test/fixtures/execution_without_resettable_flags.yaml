@@ -1,0 +1,9 @@
+scripts:
+  my_script:
+    name: "My Script"
+    script: |
+      echo my_script
+
+targets:
+  EmptyProject:
+    - my_script

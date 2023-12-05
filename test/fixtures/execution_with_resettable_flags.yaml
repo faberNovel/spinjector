@@ -1,0 +1,11 @@
+scripts:
+  my_script:
+    name: "My Script"
+    script: |
+      echo my_script
+    show_env_vars_in_log: '0'
+    always_out_of_date: '1'
+
+targets:
+  EmptyProject:
+    - my_script

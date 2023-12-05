@@ -22,6 +22,10 @@ class Xcodeproj::Project::Object::PBXNativeTarget
   def ft_build_phases_names
     build_phases.map(&:display_name)
   end
+
+  def ft_spinjector_build_phases
+    build_phases.select { |build_phase| build_phase.display_name.include? "[SPI]" }
+  end
 end
 
 class RunnerParserTest < TestCase
@@ -294,6 +298,30 @@ class RunnerParserTest < TestCase
         after_second_run_content = File.read(pbxproj_path)
 
         assert_equal after_first_run_content, after_second_run_content
+      end
+    end
+  end
+
+  def test_runner_with_resettable_flags
+    copy_empty_project_to_tmp_folder do |project_path|
+      runner = Runner.new(project_path, './test/fixtures/execution_with_resettable_flags.yaml', LOGGER)
+      runner.run
+
+      my_script_phase = runner.project.ft_main_target.ft_spinjector_build_phases.first
+      refute_nil my_script_phase
+
+      assert_equal my_script_phase.show_env_vars_in_log, '0'
+      assert_equal my_script_phase.always_out_of_date, '1'
+
+      copy_empty_project_to_tmp_folder(File.dirname(project_path)) do |new_project_path|
+        runner = Runner.new(new_project_path, './test/fixtures/execution_without_resettable_flags.yaml', LOGGER)
+        runner.run
+
+        my_script_phase_flag_resetted = runner.project.ft_main_target.ft_spinjector_build_phases.first
+        refute_nil my_script_phase_flag_resetted
+
+        assert_equal my_script_phase_flag_resetted.show_env_vars_in_log, nil
+        assert_equal my_script_phase_flag_resetted.always_out_of_date, nil
       end
     end
   end
