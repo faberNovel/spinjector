@@ -4,7 +4,13 @@ scripts:
     script: |
       echo Foo
     execution_position: :after_compile
+    show_env_vars_in_log: "0"
+  defaults:
+    name: "Defaults"
+    script: |
+      echo Defaults
 
 targets:
   Main:
     - foo
+    - defaults
