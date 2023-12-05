@@ -138,6 +138,9 @@ class ProjectService
         if script_configuration.show_env_vars_in_log == '0'
             existing_phase.show_env_vars_in_log = script_configuration.show_env_vars_in_log
         end
+        if script_configuration.always_out_of_date == '1'
+            existing_phase.always_out_of_date = script_configuration.always_out_of_date
+        end
     end
 
     # @param [Xcodeproj::Project::Object::PBXNativeTarget] target where build phases should be reordered
