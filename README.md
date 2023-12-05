@@ -66,6 +66,8 @@ output_file_list_paths:              # optional.
 dependency_file:                     # optional.
 
 execution_position:                  # optional. [:before_compile | :after_compile | :before_headers | :after_headers | :after_all].
+
+show_env_vars_in_log:                # optional. Set to '0' if you want to hide environment variables, any other values will allow them.
 ```
 
 - If you use the `script_path option`, create the script file
